@@ -3,7 +3,6 @@ defmodule VlcWeb.PageLive do
   alias Phoenix.PubSub
 
   @topic "vlc-outgoing"
-  @dirs ["/auto/tmp"]
 
   defp clean_string(s1), do: String.replace(s1, ".", " ")
   defp calc_distance(s1, s2), do: String.jaro_distance(String.downcase(s1), String.downcase(s2))
@@ -14,9 +13,11 @@ defmodule VlcWeb.PageLive do
 
     file = Vlc.Player.current_file()
     queue = Vlc.Player.queue()
+    {:ok, dir} = System.fetch_env("TARGET_DIRECTORY")
+
     send(self(), :reload)
     {:ok, assign(socket,
-      directories: @dirs,
+      directories: [dir],
       query: "",
       results: [],
       suggestions: [],

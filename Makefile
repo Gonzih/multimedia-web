@@ -17,7 +17,7 @@ db-rollback:
 	mix ecto.rollback
 
 run:
-	iex -S mix phx.server
+	env TARGET_DIRECTORY=/auto/tmp iex -S mix phx.server
 
 seed:
 	mix run priv/repo/seeds.exs
