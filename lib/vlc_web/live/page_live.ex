@@ -1,7 +1,7 @@
 defmodule VlcWeb.PageLive do
   use VlcWeb, :live_view
 
-  @dirs ["/video"]
+  @dirs ["/auto/tmp"]
 
   defp clean_string(s1), do: String.replace(s1, ".", " ")
   defp calc_distance(s1, s2), do: String.jaro_distance(String.downcase(s1), String.downcase(s2))
