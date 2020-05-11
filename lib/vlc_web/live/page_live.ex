@@ -70,6 +70,12 @@ defmodule VlcWeb.PageLive do
   end
 
   @impl true
+  def handle_event("dequeue_all", _, socket) do
+    Vlc.Player.dequeue_all()
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(:reload, %{assigns: %{directories: dirs, query: query}} = socket) do
     results = dirs
               |> FlatFiles.ls()

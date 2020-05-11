@@ -20,8 +20,20 @@
   </form>
 </section>
 
+<%= if @current_file do %>
+  <div class="message is-info">
+    <div class="message-header">
+      Currently playing
+      <button phx-click="stop" class="delete"></button>
+    </div>
+    <div class="message-body">
+      <%= @current_file %>
+    </div>
+  </div>
+<% end %>
+
 <%= if Enum.count(@queue) > 0 do %>
-<h2>Queue</h2>
+  <h2>Queue</h2>
 
 <table class="table is-hoverable is-fullwidth">
   <tbody>
@@ -41,20 +53,14 @@
         </td>
       </tr>
     <% end %>
+
+    <tr>
+      <td class="is-vcentered" colspan=2>
+        <a phx-click="dequeue_all" class="button is-danger">Clear the queue</a>
+      </td>
+    </tr>
   </tbody>
 </table>
-<% end %>
-
-<%= if @current_file do %>
-  <div class="message is-info">
-    <div class="message-header">
-      Currently playing
-      <button phx-click="stop" class="delete"></button>
-    </div>
-    <div class="message-body">
-      <%= @current_file %>
-    </div>
-  </div>
 <% end %>
 
 <h2>All files</h2>

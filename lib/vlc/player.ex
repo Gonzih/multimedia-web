@@ -47,6 +47,10 @@ defmodule Vlc.Player do
     GenServer.cast(__MODULE__, {:dequeue, path})
   end
 
+  def dequeue_all() do
+    GenServer.cast(__MODULE__, {:dequeue, :all})
+  end
+
   def stop do
     GenServer.cast(__MODULE__, {:stop})
   end
@@ -95,6 +99,12 @@ defmodule Vlc.Player do
     Cmd.exit(port)
 
     {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:dequeue, :all}, state) do
+    notify_state_change()
+    {:noreply, Map.merge(state, %{queue: []})}
   end
 
   @impl true
