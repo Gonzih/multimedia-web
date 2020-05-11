@@ -1,0 +1,28 @@
+<section class="phx-hero">
+  <%= if @current_file && @vlc_port do %>
+    Currently playing <%= @current_file %>
+    <button phx-click="stop">&#x23f9;</button>
+  <% end %>
+
+  <form phx-change="suggest">
+    <input type="text" name="q" value="<%= @query %>" placeholder="Filter" autocomplete="off"/>
+  </form>
+  <button phx-click="reload">&#x1f5d8;</button>
+</section>
+
+    <%= if @loading do %>
+      Loading...
+    <% end %>
+    <%= for {fname, path} <- @suggestions do %>
+      <div class="tooltip">
+        <%= if @current_file && @vlc_port do %>
+          <button phx-click="stop">&#x23f9;</button>
+        <% else %>
+          <button phx-click="play" phx-value-fname="<%= fname %>" phx-value-path="<%= path %>">&#x25b6;</button>
+        <% end %>
+
+        <%= fname %>
+        <span class="tooltiptext">
+        </span>
+      </div>
+    <% end %>
