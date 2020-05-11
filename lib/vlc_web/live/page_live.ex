@@ -19,9 +19,6 @@ defmodule VlcWeb.PageLive do
 
   @impl true
   def handle_event("suggest", %{"q" => query}, %{assigns: %{results: results}} = socket) do
-    results
-    |> Enum.map(fn {fname, _} -> String.jaro_distance(query, fname) > @distance_threshold end)
-    |> IO.inspect
     suggestions = results
                   |> Enum.sort_by(
                     fn {fname, _} -> calc_distance(clean_string(fname), query) end
