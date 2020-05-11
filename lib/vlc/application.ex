@@ -14,7 +14,8 @@ defmodule Vlc.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Vlc.PubSub},
       # Start the Endpoint (http/https)
-      VlcWeb.Endpoint
+      VlcWeb.Endpoint,
+      Vlc.Player,
       # Start a worker by calling: Vlc.Worker.start_link(arg)
       # {Vlc.Worker, arg}
     ]

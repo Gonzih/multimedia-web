@@ -1,6 +1,8 @@
 defmodule VlcWeb.PageLive do
   use VlcWeb, :live_view
+  alias Phoenix.PubSub
 
+  @topic "vlc-outgoing"
   @dirs ["/auto/tmp"]
 
   defp clean_string(s1), do: String.replace(s1, ".", " ")
@@ -8,8 +10,17 @@ defmodule VlcWeb.PageLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    PubSub.subscribe(Vlc.PubSub, @topic)
+
+    file = Vlc.Player.current_file()
     send(self(), :reload)
-    {:ok, assign(socket, directories: @dirs, query: "", results: [], suggestions: [], loading: true, vlc_port: nil, current_file: nil)}
+    {:ok, assign(socket,
+      directories: @dirs,
+      query: "",
+      results: [],
+      suggestions: [],
+      loading: true,
+      current_file: file)}
   end
 
   @impl true
@@ -38,15 +49,15 @@ defmodule VlcWeb.PageLive do
   end
 
   @impl true
-  def handle_event("stop", _, %{assigns: %{vlc_port: vlc_port}} = socket) do
-    Vlc.exit(vlc_port)
+  def handle_event("stop", _, socket) do
+    Vlc.Player.stop()
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("play", %{"path" => path, "fname" => fname}, socket) do
-    port = Vlc.play(path)
-    {:noreply, assign(socket, vlc_port: port, current_file: fname)}
+    Vlc.Player.play(fname, path)
+    {:noreply, socket}
   end
 
   @impl true
@@ -61,23 +72,12 @@ defmodule VlcWeb.PageLive do
   end
 
   @impl true
-  def handle_info({_, {:exit_status, _}}, socket) do
-    {:noreply, assign(socket, vlc_port: nil, current_file: nil)}
-  end
-end
-
-defmodule Vlc do
-  def play(file_path) do
-    vlc = System.find_executable("vlc")
-
-    Port.open({:spawn_executable, vlc}, [:binary, :stream, :exit_status, args: ["--fullscreen", file_path]])
-  end
-
-  def exit(port) do
-    case Port.info(port, :os_pid) do
-      {:os_pid, pid} -> System.cmd("kill", ["#{pid}"])
-      _ -> IO.puts "Already exited"
-    end
+  def handle_info(
+    %{topic: @topic, payload: :state_changed},
+    socket
+  ) do
+    file = Vlc.Player.current_file()
+    {:noreply, socket |> assign(:current_file, file)}
   end
 end
 

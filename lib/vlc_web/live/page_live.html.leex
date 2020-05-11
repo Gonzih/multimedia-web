@@ -20,7 +20,7 @@
   </form>
 </section>
 
-<%= if @current_file && @vlc_port do %>
+<%= if @current_file do %>
   <div class="message is-info">
     <div class="message-header">
       Currently playing
@@ -37,7 +37,7 @@
     <%= for {fname, path} <- @suggestions do %>
     <tr>
         <td>
-        <%= if @current_file && @vlc_port do %>
+        <%= if @current_file do %>
         <button title="Stop current video" class="button is-info" phx-click="stop"><i class="fas fa-stop"></i></button>
         <% else %>
           <button title="Play file <%= path %>"class="button is-success" phx-click="play" phx-value-fname="<%= fname %>" phx-value-path="<%= path %>"><i class="fas fa-play"></i></button>
