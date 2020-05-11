@@ -17,15 +17,18 @@ defmodule VlcWeb.PageLive do
     {:noreply, assign(socket, suggestions: results)}
   end
 
+  defp filter_suggestions(results, query) do
+    results
+    |> Enum.sort_by(
+      fn {fname, _} -> calc_distance(clean_string(fname), query) end
+    )
+    |> Enum.reverse()
+  end
+
+
   @impl true
   def handle_event("suggest", %{"q" => query}, %{assigns: %{results: results}} = socket) do
-    suggestions = results
-                  |> Enum.sort_by(
-                    fn {fname, _} -> calc_distance(clean_string(fname), query) end
-                  )
-                  |> Enum.reverse()
-
-    {:noreply, assign(socket, suggestions: suggestions)}
+    {:noreply, assign(socket, suggestions: filter_suggestions(results, query), query: query)}
   end
 
   @impl true
@@ -47,14 +50,14 @@ defmodule VlcWeb.PageLive do
   end
 
   @impl true
-  def handle_info(:reload, %{assigns: %{directories: dirs}} = socket) do
+  def handle_info(:reload, %{assigns: %{directories: dirs, query: query}} = socket) do
     results = dirs
               |> FlatFiles.ls()
               |> Enum.reject(&String.match?(&1, ~r/\.(png|jpg|ogg|lua|exe|txt|ds_store|vob|bup|ifo|xml|toc|ass|srt)$/i))
               |> Enum.reject(&String.match?(&1, ~r/\/\._/i))
               |> Enum.map(fn p -> {Path.basename(p), Path.absname(p)} end)
 
-    {:noreply, assign(socket, results: results, suggestions: results, loading: false)}
+    {:noreply, assign(socket, results: results, suggestions: filter_suggestions(results, query), loading: false)}
   end
 
   @impl true
