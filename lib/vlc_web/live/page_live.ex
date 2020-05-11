@@ -13,6 +13,7 @@ defmodule VlcWeb.PageLive do
     PubSub.subscribe(Vlc.PubSub, @topic)
 
     file = Vlc.Player.current_file()
+    queue = Vlc.Player.queue()
     send(self(), :reload)
     {:ok, assign(socket,
       directories: @dirs,
@@ -20,6 +21,7 @@ defmodule VlcWeb.PageLive do
       results: [],
       suggestions: [],
       loading: true,
+      queue: queue,
       current_file: file)}
   end
 
@@ -61,6 +63,12 @@ defmodule VlcWeb.PageLive do
   end
 
   @impl true
+  def handle_event("dequeue", %{"path" => path}, socket) do
+    Vlc.Player.dequeue(path)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(:reload, %{assigns: %{directories: dirs, query: query}} = socket) do
     results = dirs
               |> FlatFiles.ls()
@@ -77,7 +85,8 @@ defmodule VlcWeb.PageLive do
     socket
   ) do
     file = Vlc.Player.current_file()
-    {:noreply, socket |> assign(:current_file, file)}
+    queue = Vlc.Player.queue()
+    {:noreply, socket |> assign(current_file: file, queue: queue)}
   end
 end
 

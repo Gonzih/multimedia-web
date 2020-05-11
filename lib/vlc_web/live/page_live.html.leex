@@ -20,6 +20,31 @@
   </form>
 </section>
 
+<%= if Enum.count(@queue) > 0 do %>
+<h2>Queue</h2>
+
+<table class="table is-hoverable is-fullwidth">
+  <tbody>
+    <%= for {fname, path} <- @queue do %>
+      <tr>
+        <td class="is-vcentered">
+          <button phx-click="dequeue" class="delete" phx-value-path="<%= path %>"></button>
+        </td>
+
+        <td class="is-vcentered">
+          <span class="is-hidden-mobile">
+            <%= fname %>
+          </span>
+          <span class="is-hidden-tablet-only is-hidden-desktop-only is-hidden-widescreen-only">
+            <%= String.slice(fname, 0..24) %>...
+          </span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<% end %>
+
 <%= if @current_file do %>
   <div class="message is-info">
     <div class="message-header">
@@ -32,16 +57,14 @@
   </div>
 <% end %>
 
+<h2>All files</h2>
+
 <table class="table is-hoverable is-fullwidth">
   <tbody>
     <%= for {fname, path} <- @suggestions do %>
-    <tr>
+      <tr>
         <td>
-        <%= if @current_file do %>
-        <button title="Stop current video" class="button is-info" phx-click="stop"><i class="fas fa-stop"></i></button>
-        <% else %>
           <button title="Play file <%= path %>"class="button is-success" phx-click="play" phx-value-fname="<%= fname %>" phx-value-path="<%= path %>"><i class="fas fa-play"></i></button>
-        <% end %>
         </td>
 
         <td class="is-vcentered">

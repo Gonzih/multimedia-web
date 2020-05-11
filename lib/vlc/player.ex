@@ -23,15 +23,28 @@ defmodule Vlc.Player do
 
   # CLIENT
   def start_link(_) do
-    GenServer.start_link(__MODULE__, %{current_file: nil, port: nil, path: nil}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, %{
+      current_file: nil,
+      port: nil,
+      path: nil,
+      queue: [],
+    }, name: __MODULE__)
   end
 
   def current_file do
     GenServer.call(__MODULE__, {:current_file})
   end
 
+  def queue do
+    GenServer.call(__MODULE__, {:queue})
+  end
+
   def play(fname, path) do
     GenServer.cast(__MODULE__, {:play, fname, path})
+  end
+
+  def dequeue(path) do
+    GenServer.cast(__MODULE__, {:dequeue, path})
   end
 
   def stop do
@@ -57,13 +70,24 @@ defmodule Vlc.Player do
   def handle_call({:current_file}, _from, %{current_file: fname} = state), do:
     {:reply, fname, state}
 
+  @impl true
+  def handle_call({:queue}, _from, %{queue: queue} = state), do:
+    {:reply, queue, state}
+
 
   @impl true
-  def handle_cast({:play, fname, path}, state) do
+  def handle_cast({:play, fname, path}, %{queue: queue, current_file: nil} = state) do
     notify_state_change()
     port = Cmd.play(path)
 
     {:noreply, Map.merge(state, %{current_file: fname, path: path, port: port})}
+  end
+
+  @impl true
+  def handle_cast({:play, fname, path}, %{queue: queue, current_file: current_file} = state) do
+    notify_state_change()
+
+    {:noreply, Map.merge(state, %{queue: queue ++ [{fname, path}]})}
   end
 
   @impl true
@@ -74,8 +98,23 @@ defmodule Vlc.Player do
   end
 
   @impl true
-  def handle_info({_, {:exit_status, _}}, socket) do
+  def handle_cast({:dequeue, target_path}, %{queue: queue} = state) do
     notify_state_change()
-    {:noreply, %{current_file: nil, port: nil, path: nil}}
+    q = Enum.reject(queue, fn {_, path} -> path == target_path end)
+
+    {:noreply, Map.merge(state, %{queue: q})}
+  end
+
+  @impl true
+  def handle_info({_, {:exit_status, _}}, %{queue: []} = state) do
+    notify_state_change()
+    {:noreply, %{current_file: nil, port: nil, path: nil, queue: []}}
+  end
+
+  @impl true
+  def handle_info({_, {:exit_status, _}}, %{queue: [{fname, path} | queue]} = state) do
+    notify_state_change()
+    Vlc.Player.play(fname, path)
+    {:noreply, %{current_file: nil, port: nil, path: nil, queue: queue}}
   end
 end
