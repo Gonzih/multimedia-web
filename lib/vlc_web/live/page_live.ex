@@ -43,7 +43,7 @@ defmodule VlcWeb.PageLive do
 
   @impl true
   def handle_event("suggest", %{"q" => query}, %{assigns: %{results: results}} = socket) do
-    {:noreply, assign(socket, suggestions: filter_suggestions(results, query), query: query)}
+    {:noreply, assign(socket, suggestions: filter_suggestions(results, query), query: query, loading: false)}
   end
 
   @impl true
@@ -76,6 +76,10 @@ defmodule VlcWeb.PageLive do
     {:noreply, socket}
   end
 
+  @imlp true
+  def handle_event("noop", _, socket),
+    do: {:noreply, socket}
+
   @impl true
   def handle_info(:reload, %{assigns: %{directories: dirs, query: query}} = socket) do
     results = dirs
@@ -94,7 +98,7 @@ defmodule VlcWeb.PageLive do
   ) do
     file = Vlc.Player.current_file()
     queue = Vlc.Player.queue()
-    {:noreply, socket |> assign(current_file: file, queue: queue)}
+    {:noreply, socket |> assign(current_file: file, queue: queue, loading: false)}
   end
 end
 

@@ -30,6 +30,14 @@
       <%= @current_file %>
     </div>
   </div>
+
+  <section class="box">
+    <button title="Pause" class="button is-success" phx-click="noop"><i class="fas fa-pause"></i></button>
+    <button title="Resume" class="button is-success" phx-click="noop"><i class="fas fa-play"></i></button>
+    <button title="Next in queue" class="button is-success" phx-click="stop"><i class="fas fa-forward"></i></button>
+    <button title="Change audio stream" class="button is-success" phx-click="noop"><i class="fas fa-language"></i></button>
+    <button title="Change subtitles" class="button is-success" phx-click="noop"><i class="fas fa-closed-captioning"></i></button>
+  </section>
 <% end %>
 
 <%= if Enum.count(@queue) > 0 do %>
