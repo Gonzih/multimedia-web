@@ -4,7 +4,7 @@ defmodule VlcWeb.PageLive do
 
   @topic "vlc-outgoing"
 
-  defp clean_string(s1), do: String.replace(s1, ".", " ")
+  defp clean_string(s), do: String.replace(s, ".", " ")
   defp calc_distance(s1, s2), do: String.jaro_distance(String.downcase(s1), String.downcase(s2))
 
   @impl true
@@ -34,9 +34,10 @@ defmodule VlcWeb.PageLive do
   defp filter_suggestions(results, query) do
     results
     |> Enum.sort_by(
-      fn {fname, _} -> calc_distance(clean_string(fname), query) end
+      fn {fname, _path} -> calc_distance(query, clean_string(fname)) end
     )
     |> Enum.reverse()
+    |> Enum.take(50)
   end
 
 

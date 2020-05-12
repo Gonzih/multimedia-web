@@ -2,7 +2,22 @@ defmodule Vlc.Cmd do
   def play(file_path) do
     vlc = System.find_executable("vlc")
 
-    Port.open({:spawn_executable, vlc}, [:binary, :stream, :exit_status, args: ["--play-and-exit", "--fullscreen", file_path]])
+    Port.open(
+      {:spawn_executable, vlc},
+      [
+        :binary,
+        :stream,
+        :exit_status,
+        args: [
+          # -I telnet --telnet-password test
+          "--http-host", "localhost",
+          "--http-port", "11337",
+          "--play-and-exit",
+          "--fullscreen",
+          file_path
+        ]
+      ]
+    )
   end
 
   def exit(port) do
