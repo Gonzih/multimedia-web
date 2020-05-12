@@ -95,18 +95,18 @@ defmodule Vlc.Player do
 
 
   @impl true
-  def handle_cast({:play, fname, path}, %{queue: queue, current_file: nil} = state) do
+  def handle_cast({:play, fname, path}, %{queue: _, current_file: nil} = state) do
     notify_state_change()
     port = Cmd.play(path)
 
-    {:noreply, Map.merge(state, %{current_file: fname, path: path, port: port})}
+    {:noreply, %{state | current_file: fname, path: path, port: port}}
   end
 
   @impl true
-  def handle_cast({:play, fname, path}, %{queue: queue, current_file: current_file} = state) do
+  def handle_cast({:play, fname, path}, %{queue: queue, current_file: _} = state) do
     notify_state_change()
 
-    {:noreply, Map.merge(state, %{queue: queue ++ [{fname, path}]})}
+    {:noreply, %{state | queue: queue ++ [{fname, path}]}}
   end
 
   @impl true
@@ -119,7 +119,7 @@ defmodule Vlc.Player do
   @impl true
   def handle_cast({:dequeue, :all}, state) do
     notify_state_change()
-    {:noreply, Map.merge(state, %{queue: []})}
+    {:noreply, %{state | queue: []}}
   end
 
   @impl true
@@ -127,19 +127,19 @@ defmodule Vlc.Player do
     notify_state_change()
     q = Enum.reject(queue, fn {_, path} -> path == target_path end)
 
-    {:noreply, Map.merge(state, %{queue: q})}
+    {:noreply, %{state | queue: q}}
   end
 
   @impl true
   def handle_info({_, {:exit_status, _}}, %{queue: []} = state) do
     notify_state_change()
-    {:noreply, %{current_file: nil, port: nil, path: nil, queue: []}}
+    {:noreply, %{state | current_file: nil, port: nil, path: nil, queue: []}}
   end
 
   @impl true
   def handle_info({_, {:exit_status, _}}, %{queue: [{fname, path} | queue]} = state) do
     notify_state_change()
     Vlc.Player.play(fname, path)
-    {:noreply, %{current_file: nil, port: nil, path: nil, queue: queue}}
+    {:noreply, %{state | current_file: nil, port: nil, path: nil, queue: queue}}
   end
 end
