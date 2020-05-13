@@ -14,7 +14,10 @@ defmodule MediaWeb.PageLive do
       fn {fname, _path} -> calc_distance(query, clean_string(fname)) end
     )
     |> Enum.reverse()
-    |> Enum.take(50)
+
+    if query == "",
+      do: results,
+      else: Enum.take(results, 50)
   end
 
   @impl true
@@ -34,11 +37,6 @@ defmodule MediaWeb.PageLive do
       loading: true,
       queue: queue,
       current_file: file)}
-  end
-
-  @impl true
-  def handle_event("suggest", %{"q" => ""}, %{assigns: %{results: results}} = socket) do
-    {:noreply, assign(socket, suggestions: results)}
   end
 
   @impl true
