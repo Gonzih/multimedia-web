@@ -1,11 +1,11 @@
-defmodule VlcWeb.Router do
-  use VlcWeb, :router
+defmodule MediaWeb.Router do
+  use MediaWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {VlcWeb.LayoutView, :root}
+    plug :put_root_layout, {MediaWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -14,14 +14,14 @@ defmodule VlcWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", VlcWeb do
+  scope "/", MediaWeb do
     pipe_through :browser
 
     live "/", PageLive, :index
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", VlcWeb do
+  # scope "/api", MediaWeb do
   #   pipe_through :api
   # end
 
@@ -37,7 +37,7 @@ defmodule VlcWeb.Router do
 
     scope "/" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: VlcWeb.Telemetry
+      live_dashboard "/dashboard", metrics: MediaWeb.Telemetry
     end
   end
 end

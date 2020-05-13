@@ -1,12 +1,12 @@
-defmodule VlcWeb do
+defmodule MediaWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.
 
   This can be used in your application as:
 
-      use VlcWeb, :controller
-      use VlcWeb, :view
+      use MediaWeb, :controller
+      use MediaWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -19,19 +19,19 @@ defmodule VlcWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: VlcWeb
+      use Phoenix.Controller, namespace: MediaWeb
 
       import Plug.Conn
-      import VlcWeb.Gettext
-      alias VlcWeb.Router.Helpers, as: Routes
+      import MediaWeb.Gettext
+      alias MediaWeb.Router.Helpers, as: Routes
     end
   end
 
   def view do
     quote do
       use Phoenix.View,
-        root: "lib/vlc_web/templates",
-        namespace: VlcWeb
+        root: "lib/media_web/templates",
+        namespace: MediaWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
@@ -44,7 +44,7 @@ defmodule VlcWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {VlcWeb.LayoutView, "live.html"}
+        layout: {MediaWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
     end
@@ -71,7 +71,7 @@ defmodule VlcWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import VlcWeb.Gettext
+      import MediaWeb.Gettext
     end
   end
 
@@ -86,9 +86,9 @@ defmodule VlcWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import VlcWeb.ErrorHelpers
-      import VlcWeb.Gettext
-      alias VlcWeb.Router.Helpers, as: Routes
+      import MediaWeb.ErrorHelpers
+      import MediaWeb.Gettext
+      alias MediaWeb.Router.Helpers, as: Routes
     end
   end
 

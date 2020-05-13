@@ -1,5 +1,5 @@
-defmodule VlcWeb.LayoutViewTest do
-  use VlcWeb.ConnCase, async: true
+defmodule MediaWeb.LayoutViewTest do
+  use MediaWeb.ConnCase, async: true
 
   # When testing helpers, you may want to import Phoenix.HTML and
   # use functions such as safe_to_string() to convert the helper

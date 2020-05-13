@@ -1,4 +1,4 @@
-defmodule VlcWeb.ConnCase do
+defmodule MediaWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,7 +11,7 @@ defmodule VlcWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use VlcWeb.ConnCase, async: true`, although
+  by setting `use MediaWeb.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -22,20 +22,20 @@ defmodule VlcWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import VlcWeb.ConnCase
+      import MediaWeb.ConnCase
 
-      alias VlcWeb.Router.Helpers, as: Routes
+      alias MediaWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
-      @endpoint VlcWeb.Endpoint
+      @endpoint MediaWeb.Endpoint
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Vlc.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Media.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Vlc.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Media.Repo, {:shared, self()})
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}

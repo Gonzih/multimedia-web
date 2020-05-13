@@ -1,18 +1,27 @@
-defmodule VlcWeb.PageLive do
-  use VlcWeb, :live_view
+defmodule MediaWeb.PageLive do
+  use MediaWeb, :live_view
   alias Phoenix.PubSub
 
-  @topic "vlc-outgoing"
+  @topic "media-outgoing"
 
   defp clean_string(s), do: String.replace(s, ".", " ")
   defp calc_distance(s1, s2), do: String.jaro_distance(String.downcase(s1), String.downcase(s2))
 
+  defp filter_suggestions(results, query) do
+    results
+    |> Enum.sort_by(
+      fn {fname, _path} -> calc_distance(query, clean_string(fname)) end
+    )
+    |> Enum.reverse()
+    |> Enum.take(50)
+  end
+
   @impl true
   def mount(_params, _session, socket) do
-    PubSub.subscribe(Vlc.PubSub, @topic)
+    PubSub.subscribe(Media.PubSub, @topic)
 
-    file = Vlc.Player.current_file()
-    queue = Vlc.Player.queue()
+    file = Media.Player.current_file()
+    queue = Media.Player.queue()
     {:ok, dir} = System.fetch_env("TARGET_DIRECTORY")
 
     send(self(), :reload)
@@ -31,16 +40,6 @@ defmodule VlcWeb.PageLive do
     {:noreply, assign(socket, suggestions: results)}
   end
 
-  defp filter_suggestions(results, query) do
-    results
-    |> Enum.sort_by(
-      fn {fname, _path} -> calc_distance(query, clean_string(fname)) end
-    )
-    |> Enum.reverse()
-    |> Enum.take(50)
-  end
-
-
   @impl true
   def handle_event("suggest", %{"q" => query}, %{assigns: %{results: results}} = socket) do
     {:noreply, assign(socket, suggestions: filter_suggestions(results, query), query: query, loading: false)}
@@ -54,25 +53,25 @@ defmodule VlcWeb.PageLive do
 
   @impl true
   def handle_event("stop", _, socket) do
-    Vlc.Player.stop()
+    Media.Player.stop()
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("play", %{"path" => path, "fname" => fname}, socket) do
-    Vlc.Player.play(fname, path)
+    Media.Player.play(fname, path)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("dequeue", %{"path" => path}, socket) do
-    Vlc.Player.dequeue(path)
+    Media.Player.dequeue(path)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("dequeue_all", _, socket) do
-    Vlc.Player.dequeue_all()
+    Media.Player.dequeue_all()
     {:noreply, socket}
   end
 
@@ -96,8 +95,8 @@ defmodule VlcWeb.PageLive do
     %{topic: @topic, payload: :state_changed},
     socket
   ) do
-    file = Vlc.Player.current_file()
-    queue = Vlc.Player.queue()
+    file = Media.Player.current_file()
+    queue = Media.Player.queue()
     {:noreply, socket |> assign(current_file: file, queue: queue, loading: false)}
   end
 end

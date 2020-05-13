@@ -1,19 +1,18 @@
-defmodule Vlc.Cmd do
+defmodule Media.Cmd do
+  @player "mplayer"
+
   def play(file_path) do
-    vlc = System.find_executable("vlc")
+    media = System.find_executable(@player)
 
     Port.open(
-      {:spawn_executable, vlc},
+      {:spawn_executable, media},
       [
         :binary,
         :stream,
         :exit_status,
         args: [
           # -I telnet --telnet-password test
-          "--http-host", "localhost",
-          "--http-port", "11337",
-          "--play-and-exit",
-          "--fullscreen",
+          "-fs",
           file_path
         ]
       ]
@@ -28,13 +27,14 @@ defmodule Vlc.Cmd do
   end
 end
 
-defmodule Vlc.Player do
+defmodule Media.Player do
+  require Logger
   use GenServer
   alias Phoenix.PubSub
-  alias Vlc.Cmd
+  alias Media.Cmd
 
-  @in_topic "vlc-incoming"
-  @out_topic "vlc-outgoing"
+  @in_topic "media-incoming"
+  @out_topic "media-outgoing"
 
   # CLIENT
   def start_link(_) do
@@ -72,7 +72,7 @@ defmodule Vlc.Player do
 
   def notify_state_change do
     PubSub.broadcast(
-      Vlc.PubSub,
+      Media.PubSub,
       @out_topic,
       %{topic: @out_topic, payload: :state_changed}
     )
@@ -80,7 +80,7 @@ defmodule Vlc.Player do
 
   @impl true
   def init(state) do
-    PubSub.subscribe(Vlc.PubSub, @in_topic)
+    PubSub.subscribe(Media.PubSub, @in_topic)
 
     {:ok, state}
   end
@@ -139,7 +139,13 @@ defmodule Vlc.Player do
   @impl true
   def handle_info({_, {:exit_status, _}}, %{queue: [{fname, path} | queue]} = state) do
     notify_state_change()
-    Vlc.Player.play(fname, path)
+    Media.Player.play(fname, path)
     {:noreply, %{state | current_file: nil, port: nil, path: nil, queue: queue}}
+  end
+
+  @impl true
+  def handle_info({_, {:data, data}}, state) do
+    Logger.debug("mplayer: #{data}")
+    {:noreply, state}
   end
 end

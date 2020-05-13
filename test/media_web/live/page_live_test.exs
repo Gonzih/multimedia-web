@@ -1,5 +1,5 @@
-defmodule VlcWeb.PageLiveTest do
-  use VlcWeb.ConnCase
+defmodule MediaWeb.PageLiveTest do
+  use MediaWeb.ConnCase
 
   import Phoenix.LiveViewTest
 

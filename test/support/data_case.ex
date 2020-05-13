@@ -1,4 +1,4 @@
-defmodule Vlc.DataCase do
+defmodule Media.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,7 +10,7 @@ defmodule Vlc.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use Vlc.DataCase, async: true`, although
+  by setting `use Media.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -18,20 +18,20 @@ defmodule Vlc.DataCase do
 
   using do
     quote do
-      alias Vlc.Repo
+      alias Media.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Vlc.DataCase
+      import Media.DataCase
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Vlc.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Media.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Vlc.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Media.Repo, {:shared, self()})
     end
 
     :ok

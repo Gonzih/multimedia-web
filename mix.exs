@@ -1,9 +1,9 @@
-defmodule Vlc.MixProject do
+defmodule Media.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :vlc,
+      app: :media,
       version: "0.1.0",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -19,7 +19,7 @@ defmodule Vlc.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Vlc.Application, []},
+      mod: {Media.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

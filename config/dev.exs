@@ -1,10 +1,10 @@
 use Mix.Config
 
 # Configure your database
-config :vlc, Vlc.Repo,
+config :media, Media.Repo,
   username: "postgres",
   password: "postgres",
-  database: "vlc_dev",
+  database: "media_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -15,7 +15,7 @@ config :vlc, Vlc.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :vlc, VlcWeb.Endpoint,
+config :media, MediaWeb.Endpoint,
   http: [port: 4200],
   debug_errors: true,
   code_reloader: true,
@@ -55,13 +55,13 @@ config :vlc, VlcWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :vlc, VlcWeb.Endpoint,
+config :media, MediaWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/vlc_web/(live|views)/.*(ex)$",
-      ~r"lib/vlc_web/templates/.*(eex)$"
+      ~r"lib/media_web/(live|views)/.*(ex)$",
+      ~r"lib/media_web/templates/.*(eex)$"
     ]
   ]
 

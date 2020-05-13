@@ -1,4 +1,4 @@
-# Vlc
+# Media
 
 To start your Phoenix server:
 

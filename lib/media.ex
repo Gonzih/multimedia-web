@@ -1,6 +1,6 @@
-defmodule Vlc do
+defmodule Media do
   @moduledoc """
-  Vlc keeps the contexts that define your domain
+  Media keeps the contexts that define your domain
   and business logic.
 
   Contexts are also responsible for managing your data, regardless

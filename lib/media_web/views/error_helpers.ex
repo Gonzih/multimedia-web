@@ -1,4 +1,4 @@
-defmodule VlcWeb.ErrorHelpers do
+defmodule MediaWeb.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """
@@ -39,9 +39,9 @@ defmodule VlcWeb.ErrorHelpers do
     # should be written to the errors.po file. The :count option is
     # set by Ecto and indicates we should also apply plural rules.
     if count = opts[:count] do
-      Gettext.dngettext(VlcWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(MediaWeb.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(VlcWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(MediaWeb.Gettext, "errors", msg, opts)
     end
   end
 end

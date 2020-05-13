@@ -1,4 +1,4 @@
-defmodule VlcWeb.Telemetry do
+defmodule MediaWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -29,11 +29,11 @@ defmodule VlcWeb.Telemetry do
       ),
 
       # Database Metrics
-      summary("vlc.repo.query.total_time", unit: {:native, :millisecond}),
-      summary("vlc.repo.query.decode_time", unit: {:native, :millisecond}),
-      summary("vlc.repo.query.query_time", unit: {:native, :millisecond}),
-      summary("vlc.repo.query.queue_time", unit: {:native, :millisecond}),
-      summary("vlc.repo.query.idle_time", unit: {:native, :millisecond}),
+      summary("media.repo.query.total_time", unit: {:native, :millisecond}),
+      summary("media.repo.query.decode_time", unit: {:native, :millisecond}),
+      summary("media.repo.query.query_time", unit: {:native, :millisecond}),
+      summary("media.repo.query.queue_time", unit: {:native, :millisecond}),
+      summary("media.repo.query.idle_time", unit: {:native, :millisecond}),
 
       # VM Metrics
       summary("vm.memory.total", unit: {:byte, :kilobyte}),
@@ -47,7 +47,7 @@ defmodule VlcWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {VlcWeb, :count_users, []}
+      # {MediaWeb, :count_users, []}
     ]
   end
 end

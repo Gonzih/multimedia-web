@@ -7,15 +7,15 @@
 # General application configuration
 use Mix.Config
 
-config :vlc,
-  ecto_repos: [Vlc.Repo]
+config :media,
+  ecto_repos: [Media.Repo]
 
 # Configures the endpoint
-config :vlc, VlcWeb.Endpoint,
+config :media, MediaWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "9fzk6GcX9NgvXs/6Lh9lUaqN1ycS6lgVCRyUZBwqpEO0pwuoRCCCp/RF2mrfih8a",
-  render_errors: [view: VlcWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: Vlc.PubSub,
+  render_errors: [view: MediaWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: Media.PubSub,
   live_view: [signing_salt: "JFHmAT43"]
 
 # Configures Elixir's Logger

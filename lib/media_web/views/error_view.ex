@@ -1,5 +1,5 @@
-defmodule VlcWeb.ErrorView do
-  use VlcWeb, :view
+defmodule MediaWeb.ErrorView do
+  use MediaWeb, :view
 
   # If you want to customize a particular status code
   # for a certain format, you may uncomment below.
