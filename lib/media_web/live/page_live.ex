@@ -8,16 +8,16 @@ defmodule MediaWeb.PageLive do
   defp clean_string(s), do: String.replace(s, ".", " ")
   defp calc_distance(s1, s2), do: String.jaro_distance(String.downcase(s1), String.downcase(s2))
 
+  defp filter_suggestions(results, ""),
+    do: results
+
   defp filter_suggestions(results, query) do
     results
     |> Enum.sort_by(
       fn {fname, _path} -> calc_distance(query, clean_string(fname)) end
     )
     |> Enum.reverse()
-
-    if query == "",
-      do: results,
-      else: Enum.take(results, 50)
+    |> Enum.take(50)
   end
 
   @impl true
@@ -109,10 +109,6 @@ defmodule MediaWeb.PageLive do
     Media.Player.command("volume -#{@volume_value}")
     {:noreply, socket}
   end
-
-  @imlp true
-  def handle_event("noop", _, socket),
-    do: {:noreply, socket}
 
   @impl true
   def handle_info(:reload, %{assigns: %{directories: dirs, query: query}} = socket) do
