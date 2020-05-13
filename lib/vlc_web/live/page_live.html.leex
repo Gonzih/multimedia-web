@@ -24,7 +24,7 @@
   <div class="message is-info">
     <div class="message-header">
       Currently playing
-      <button phx-click="stop" class="delete"></button>
+      <button title="Stop" phx-click="stop" class="delete"></button>
     </div>
     <div class="message-body">
       <%= @current_file %>
@@ -47,8 +47,8 @@
   <tbody>
     <%= for {fname, path} <- @queue do %>
       <tr>
-        <td class="is-vcentered">
-          <button phx-click="dequeue" class="delete" phx-value-path="<%= path %>"></button>
+        <td>
+          <button title="Remove from the queue" phx-click="dequeue" class="delete" phx-value-path="<%= path %>"></button>
         </td>
 
         <td class="is-vcentered">
@@ -64,7 +64,7 @@
 
     <tr>
       <td class="is-vcentered" colspan=2>
-        <a phx-click="dequeue_all" class="button is-danger">Clear the queue</a>
+        <a title="Clear the queue" phx-click="dequeue_all" class="button is-danger"><i class="fas fa-trash"></i></a>
       </td>
     </tr>
   </tbody>
