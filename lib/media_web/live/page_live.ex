@@ -3,6 +3,7 @@ defmodule MediaWeb.PageLive do
   alias Phoenix.PubSub
 
   @topic "media-outgoing"
+  @volume_value 20
 
   defp clean_string(s), do: String.replace(s, ".", " ")
   defp calc_distance(s1, s2), do: String.jaro_distance(String.downcase(s1), String.downcase(s2))
@@ -72,6 +73,42 @@ defmodule MediaWeb.PageLive do
   @impl true
   def handle_event("dequeue_all", _, socket) do
     Media.Player.dequeue_all()
+    {:noreply, socket}
+  end
+
+  @imlp true
+  def handle_event("pause", _, socket) do
+    Media.Player.command("pause")
+    {:noreply, socket}
+  end
+
+  @imlp true
+  def handle_event("switch_audio", _, socket) do
+    Media.Player.command("switch_audio")
+    {:noreply, socket}
+  end
+
+  @imlp true
+  def handle_event("switch_subtitle", _, socket) do
+    Media.Player.command("sub_select")
+    {:noreply, socket}
+  end
+
+  @imlp true
+  def handle_event("switch_audio", _, socket) do
+    Media.Player.command("switch_audio")
+    {:noreply, socket}
+  end
+
+  @imlp true
+  def handle_event("volume_up", _, socket) do
+    Media.Player.command("volume +#{@volume_value}")
+    {:noreply, socket}
+  end
+
+  @imlp true
+  def handle_event("volume_down", _, socket) do
+    Media.Player.command("volume -#{@volume_value}")
     {:noreply, socket}
   end
 

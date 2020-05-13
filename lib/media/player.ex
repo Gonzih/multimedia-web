@@ -1,7 +1,15 @@
 defmodule Media.Cmd do
+  require Logger
+
   @player "mplayer"
+  @fifo_file "/tmp/mplayer-elixir-fifofile"
 
   def play(file_path) do
+    if !File.exists?(@fifo_file) do
+      {out, 0} = System.cmd("mkfifo", [@fifo_file])
+      Logger.debug("mkfifor: #{out}")
+    end
+
     media = System.find_executable(@player)
 
     Port.open(
@@ -11,8 +19,10 @@ defmodule Media.Cmd do
         :stream,
         :exit_status,
         args: [
-          # -I telnet --telnet-password test
           "-fs",
+          "-slave",
+          "-input",
+          "file=#{@fifo_file}",
           file_path
         ]
       ]
@@ -22,8 +32,17 @@ defmodule Media.Cmd do
   def exit(port) do
     case Port.info(port, :os_pid) do
       {:os_pid, pid} -> System.cmd("kill", ["#{pid}"])
-      _ -> IO.puts "Already exited"
+      _ -> Logger.debug "Player not running"
     end
+
+
+    if File.exists?(@fifo_file) do
+      File.rm!(@fifo_file)
+    end
+  end
+
+  def command(_, cmd) do
+    File.write!(@fifo_file, "#{cmd}\n", [:append, :sync])
   end
 end
 
@@ -68,6 +87,10 @@ defmodule Media.Player do
 
   def stop do
     GenServer.cast(__MODULE__, {:stop})
+  end
+
+  def command(cmd) do
+    GenServer.cast(__MODULE__, {:command, cmd})
   end
 
   def notify_state_change do
@@ -131,6 +154,13 @@ defmodule Media.Player do
   end
 
   @impl true
+  def handle_cast({:command, cmd}, %{port: port} = state) do
+    Cmd.command(port, cmd)
+
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_info({_, {:exit_status, _}}, %{queue: []} = state) do
     notify_state_change()
     {:noreply, %{state | current_file: nil, port: nil, path: nil, queue: []}}
@@ -145,7 +175,7 @@ defmodule Media.Player do
 
   @impl true
   def handle_info({_, {:data, data}}, state) do
-    Logger.debug("mplayer: #{data}")
+    # Logger.debug("mplayer: #{data}")
     {:noreply, state}
   end
 end

@@ -32,11 +32,14 @@
   </div>
 
   <section class="box">
-    <button title="Pause" class="button is-success" phx-click="noop"><i class="fas fa-pause"></i></button>
-    <button title="Resume" class="button is-success" phx-click="noop"><i class="fas fa-play"></i></button>
-    <button title="Next in queue" class="button is-success" phx-click="stop"><i class="fas fa-forward"></i></button>
-    <button title="Change audio stream" class="button is-success" phx-click="noop"><i class="fas fa-language"></i></button>
-    <button title="Change subtitles" class="button is-success" phx-click="noop"><i class="fas fa-closed-captioning"></i></button>
+    <button title="Pause" class="button is-success" phx-click="pause"><i class="fas fa-play"></i>&nbsp;<i class="fas fa-pause"></i></button>
+    <%= if Enum.count(@queue) > 0 do %>
+      <button title="Next in queue" class="button is-success" phx-click="stop"><i class="fas fa-forward"></i></button>
+    <% end %>
+    <button title="Change audio stream" class="button is-success" phx-click="switch_audio"><i class="fas fa-language"></i></button>
+    <button title="Change subtitles" class="button is-success" phx-click="switch_subtitle"><i class="fas fa-closed-captioning"></i></button>
+    <button title="Volume Down" class="button is-success" phx-click="volume_down"><i class="fas fa-volume-down"></i></button>
+    <button title="Volume Up" class="button is-success" phx-click="volume_up"><i class="fas fa-volume-up"></i></button>
   </section>
 <% end %>
 
