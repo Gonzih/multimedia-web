@@ -26,15 +26,20 @@ defmodule MediaWeb.PageLive do
 
     file = Media.Player.current_file()
     queue = Media.Player.queue()
+    results = Media.Player.all_files()
     {:ok, dir} = System.fetch_env("TARGET_DIRECTORY")
+    dirs = [dir]
 
-    send(self(), :reload)
+    if Enum.count(results) == 0 do
+      Media.Player.reload_files(dirs)
+    end
+
     {:ok, assign(socket,
-      directories: [dir],
+      directories: dirs,
       query: "",
-      results: [],
-      suggestions: [],
-      loading: true,
+      results: results,
+      suggestions: results,
+      loading: false,
       queue: queue,
       current_file: file)}
   end
@@ -45,8 +50,8 @@ defmodule MediaWeb.PageLive do
   end
 
   @impl true
-  def handle_event("reload", _, socket) do
-    send(self(), :reload)
+  def handle_event("reload", _, %{assigns: %{directories: dirs}} = socket) do
+    Media.Player.reload_files(dirs)
     {:noreply, assign(socket, loading: true)}
   end
 
@@ -111,47 +116,21 @@ defmodule MediaWeb.PageLive do
   end
 
   @impl true
-  def handle_info(:reload, %{assigns: %{directories: dirs, query: query}} = socket) do
-    results = dirs
-              |> FlatFiles.ls()
-              |> Enum.reject(&String.match?(&1, ~r/\.(png|jpg|ogg|lua|exe|txt|ds_store|vob|bup|ifo|xml|toc|ass|srt)$/i))
-              |> Enum.reject(&String.match?(&1, ~r/\/\._/i))
-              |> Enum.map(fn p -> {Path.basename(p), Path.absname(p)} end)
-
-    {:noreply, assign(socket, results: results, suggestions: filter_suggestions(results, query), loading: false)}
-  end
-
-  @impl true
   def handle_info(
-    %{topic: @topic, payload: :state_changed},
+    %{topic: @topic, payload: :state_change},
     socket
   ) do
     file = Media.Player.current_file()
     queue = Media.Player.queue()
     {:noreply, socket |> assign(current_file: file, queue: queue, loading: false)}
   end
+
+  @impl true
+  def handle_info(
+    %{topic: @topic, payload: :files_reload},
+    %{assigns: %{query: query}} = socket
+  ) do
+    results = Media.Player.all_files()
+    {:noreply, socket |> assign(results: results, suggestions: filter_suggestions(results, query), loading: false)}
+  end
 end
-
-defmodule FlatFiles do# {{{
-  def list_all(filepath) do
-    _list_all(filepath)
-  end
-
-  defp _list_all(filepath) do
-    cond do
-      String.contains?(filepath, ".git") -> []
-      true -> expand(File.ls(filepath), filepath)
-    end
-  end
-
-  defp expand({:ok, files}, path) do
-    files
-    |> Enum.flat_map(&_list_all("#{path}/#{&1}"))
-  end
-
-  defp expand({:error, _}, path) do
-    [path]
-  end
-
-  def ls(paths), do: expand({:ok, paths}, "/")
-end# }}}
