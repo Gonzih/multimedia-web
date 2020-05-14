@@ -161,7 +161,7 @@ defmodule Media.Player do
     notify_files_change()
     files = dirs
             |> Media.FlatFiles.ls()
-            |> Enum.reject(&String.match?(&1, ~r/\.(png|jpg|ogg|lua|exe|txt|ds_store|vob|bup|ifo|xml|toc|ass|srt)$/i))
+            |> Enum.reject(&String.match?(&1, ~r/\.(png|jpg|ogg|lua|exe|txt|ds_store|vob|bup|ifo|xml|toc|ass|srt|pdf)$/i))
             |> Enum.reject(&String.match?(&1, ~r/\/\._/i))
             |> Enum.map(fn p -> {Path.basename(p), Path.absname(p)} end)
 
