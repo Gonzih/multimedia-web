@@ -135,11 +135,11 @@ defmodule Media.Player do
   end
 
   def notify_files_change do
-    notify_about(:state_change)
+    notify_about(:files_reload)
   end
 
   def notify_state_change do
-    notify_about(:files_reload)
+    notify_about(:state_change)
   end
 
   @impl true
