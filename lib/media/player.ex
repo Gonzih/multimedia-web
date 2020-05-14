@@ -91,15 +91,15 @@ defmodule Media.Player do
   end
 
   def current_file do
-    GenServer.call(__MODULE__, {:current_file})
+    GenServer.call(__MODULE__, {:fetch, :current_file})
   end
 
   def queue do
-    GenServer.call(__MODULE__, {:queue})
+    GenServer.call(__MODULE__, {:fetch, :queue})
   end
 
   def all_files do
-    GenServer.call(__MODULE__, {:all_files})
+    GenServer.call(__MODULE__, {:fetch, :files})
   end
 
   def reload_files(dirs) do
@@ -150,16 +150,11 @@ defmodule Media.Player do
   end
 
   @impl true
-  def handle_call({:current_file}, _from, %{current_file: fname} = state), do:
-    {:reply, fname, state}
+  def handle_call({:fetch, key}, _from, state) do
+    {:ok, v} = Map.fetch(state, key)
 
-  @impl true
-  def handle_call({:queue}, _from, %{queue: queue} = state), do:
-    {:reply, queue, state}
-
-  @impl true
-  def handle_call({:all_files}, _from, %{files: files} = state), do:
-    {:reply, files, state}
+    {:reply, v, state}
+  end
 
   @impl true
   def handle_cast({:reload_files, dirs}, state) do
