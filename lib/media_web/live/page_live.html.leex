@@ -4,7 +4,7 @@
       <div class="column is-four-fifths">
         <div class="field">
           <div class="control">
-            <input class="input" type="text" name="q" value="<%= @query %>" placeholder="Filter" autocomplete="off"/>
+            <input class="input" type="text" phx-debounce="1500" name="q" value="<%= @query %>" placeholder="Filter" autocomplete="off"/>
           </div>
         </div>
       </div>
