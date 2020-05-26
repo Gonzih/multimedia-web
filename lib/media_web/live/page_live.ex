@@ -5,19 +5,39 @@ defmodule MediaWeb.PageLive do
   @topic "media-outgoing"
   @volume_value 20
 
-  defp clean_string(s), do: String.replace(s, ".", " ")
-  defp calc_distance(s1, s2), do: String.jaro_distance(String.downcase(s1), String.downcase(s2))
+  defp prepare_string(s),
+    do: s
+    |> String.replace(".", " ")
+    |> String.replace("/", " ")
+    |> String.downcase
+    |> String.split(" ")
+    |> Enum.uniq
+
+  defp number_of_matches(list, queries) do
+    bools = for s1 <- list, s2 <- queries do
+      String.contains?(s1, s2) && String.length(s1) > 0 && String.length(s2) > 0
+    end
+
+    bools |> Enum.filter(fn b -> b end)
+  end
+
+  defp match_string(path, query) do
+    p = prepare_string(path)
+    q = prepare_string(query)
+    matches = number_of_matches(p, q)
+
+    Enum.count(matches) >= Enum.count(q)
+  end
 
   defp filter_suggestions(results, ""),
     do: results
 
   defp filter_suggestions(results, query) do
     results
-    |> Enum.sort_by(
-      fn {fname, _path} -> calc_distance(query, clean_string(fname)) end
+    |> Enum.filter(
+      fn {_fname, path} -> match_string(path, query) end
     )
-    |> Enum.reverse()
-    |> Enum.take(50)
+    |> Enum.sort()
   end
 
   @impl true
@@ -113,6 +133,11 @@ defmodule MediaWeb.PageLive do
   def handle_event("volume_down", _, socket) do
     Media.Player.command("volume -#{@volume_value}")
     {:noreply, socket}
+  end
+
+  @imlp true
+  def handle_event("clear_filter", _, %{assigns: %{results: results}} = socket) do
+    {:noreply, assign(socket, suggestions: filter_suggestions(results, ""), query: "", loading: false)}
   end
 
   @impl true
